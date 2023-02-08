@@ -12,41 +12,44 @@ import time
 # 6 = Found Path
 
 def BFS(maze, s):
-    pathEdges = {}
-    queue = [s]
-    maze[s[0],s[1]] = 4 # Queued
+    queue = [s]         # Queue the start
+    maze[s[0],s[1]] = 4 
 
-    depthCounter = 0
-    modifiedNodes = []
+    depthCounter = 0    # number of nodes checked
+
+    modifiedNodes = []  # Used in plotting
     modifiedNodeStatus = []
+    pathEdges = {}
     while queue != []:
         depthCounter += 1
         currNode = queue.pop(0) # FIFO queue
         
-        # Check surrounding 8 nodes
+        # Check surrounding 8 (or 4) nodes
         #for i in [-1,0,1]:
-        for i in [[0,-1],[0,1],[-1,0],[1,0]]:    
-            adjNode = currNode + i
             #for j in [-1,0,1]:
                 #adjNode = currNode + [i,j]
-            if maze[adjNode[0],adjNode[1]] == 3:    # end node: quit
+        for i in [[0,-1],[0,1],[-1,0],[1,0]]:    
+            adjNode = currNode + i
+            
+            # end node: quit
+            if maze[adjNode[0],adjNode[1]] == 3:    
                 queue = []
                 pathEdges[tuple([adjNode[0],adjNode[1]])] = tuple([currNode[0],currNode[1]])
-                break                               
-            elif maze[adjNode[0],adjNode[1]] == 0:    # open node: add to queue
+                break    
+            # open node: add to queue                           
+            elif maze[adjNode[0],adjNode[1]] == 0:    
                 maze[adjNode[0],adjNode[1]] = 4     
                 queue.append(adjNode)
                 pathEdges[tuple([adjNode[0],adjNode[1]])] = tuple([currNode[0],currNode[1]])
-                # BELOW IS FOR PLOTTING
-                modifiedNodes.append([adjNode[0],adjNode[1]])
+  
+                modifiedNodes.append([adjNode[0],adjNode[1]])   # Plotting stuff
                 modifiedNodeStatus.append(4)
 
         maze[currNode[0],currNode[1]] = 5   # mark current as Visitied
-        # BELOW IS FOR PLOTTING
-        modifiedNodes.append([currNode[0],currNode[1]])
+        modifiedNodes.append([currNode[0],currNode[1]]) # Plotting stuff
         modifiedNodeStatus.append(5)
                 
-        if depthCounter%1000 == 0:
+        if depthCounter%100 == 0:
             Plot_Search_Path(modifiedNodes, modifiedNodeStatus)
             modifiedNodes = []
             modifiedNodeStatus = []
@@ -55,8 +58,8 @@ def BFS(maze, s):
 
     shortestPath = [tuple([adjNode[0],adjNode[1]])]
     while True:
-        if shortestPath[len(shortestPath)-1] in pathEdges:
-            shortestPath.append(pathEdges[shortestPath[len(shortestPath)-1]])
+        if shortestPath[-1] in pathEdges:
+            shortestPath.append(pathEdges[shortestPath[-1]])
         else:
             break
 
@@ -64,7 +67,6 @@ def BFS(maze, s):
 
 def Draw_Maze_Innit(mazelist):
     # Loop over all points in maze
-    ax.cla()
     rowCounter = 0
     entryCounter = 0
     for row in mazelist:
@@ -85,7 +87,6 @@ def Draw_Maze_Innit(mazelist):
         entryCounter = 0
     ax.axis('equal')
     plt.pause(1e-10)
-
     return
 
 def Plot_Search_Path(points, stati):    
@@ -111,7 +112,7 @@ def PlotPath(path):
 
 
 if __name__ == '__main__':
-    mazeList = pd.read_csv("Homework 1\Map1.csv", header=None).to_numpy()
+    mazeList = pd.read_csv("Homework 1\Map3.csv", header=None).to_numpy()
     
     height, width = mazeList.shape
     start = np.where(mazeList==2)
