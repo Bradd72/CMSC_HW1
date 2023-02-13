@@ -10,11 +10,13 @@ import time
 # 4 = Queued
 # 5 = Visited
 # 6 = Found Path
+# [x, y, distance]
 
-def BFS(maze, s):
+def Dijkstra(maze, s):
     startTime = time.time()
     queue = [s]         # Queue the start
     maze[s[0],s[1]] = 4 
+    nodeDistances[s[0],s[1]] = s[2]
 
     depthCounter = 0    # number of nodes checked
 
@@ -26,10 +28,9 @@ def BFS(maze, s):
         currNode = queue.pop(0) # FIFO queue
         
         # Check surrounding 8 (or 4) nodes
-        # for i in [[-1,-1],[0,-1],[1,-1],[-1,0],[1,0],[-1,1],[0,1],[1,1]]:  
-        for i in [[0,-1],[-1,0],[1,0],[0,1]]:    
-            adjNode = [currNode[0]+i[0],currNode[1]+i[1]]
-            
+        #for i in [[-1,-1,1.414],[0,-1,1],[1,-1,1.414],[-1,0,1],[1,0,1],[-1,1,1.414],[0,1,1],[1,1,1.414]]:  
+        for i in [[0,-1,1],[-1,0,1],[1,0,1],[0,1,1]]:  
+            adjNode = [currNode[0]+i[0],currNode[1]+i[1],currNode[2]+i[2]]
             # end node: quit
             if maze[adjNode[0],adjNode[1]] == 3:    
                 queue = []
@@ -37,13 +38,30 @@ def BFS(maze, s):
                 break    
             # open node: add to queue                           
             elif maze[adjNode[0],adjNode[1]] == 0:    
-                maze[adjNode[0],adjNode[1]] = 4     
-                queue.append(adjNode)
-                pathEdges[tuple([adjNode[0],adjNode[1]])] = tuple([currNode[0],currNode[1]])
+                # Weighting fastest path
+                if adjNode[2] <= nodeDistances[adjNode[0],adjNode[1]] or nodeDistances[adjNode[0],adjNode[1]] == 0:
+                    nodeDistances[adjNode[0],adjNode[1]] = adjNode[2]
+                    pathEdges[tuple([adjNode[0],adjNode[1]])] = tuple([currNode[0],currNode[1]])
+
+                if queue == []:
+                    queue.append(adjNode)
+                    maze[adjNode[0],adjNode[1]] = 4
+                else:
+                    tn = 0
+                    for entry in queue:
+                        if adjNode[2] < entry[2]:
+                            queue.insert(tn,adjNode)
+                            maze[adjNode[0],adjNode[1]] = 4
+                            break
+                        elif adjNode[2] >= entry[-1]:
+                            queue.append(adjNode)
+                            maze[adjNode[0],adjNode[1]] = 4
+                            break
+                        tn += 1
   
                 modifiedNodes.append([adjNode[0],adjNode[1]])   # Plotting stuff
                 modifiedNodeStatus.append(4)
-
+            
         maze[currNode[0],currNode[1]] = 5   # mark current as Visitied
         modifiedNodes.append([currNode[0],currNode[1]]) # Plotting stuff
         modifiedNodeStatus.append(5)
@@ -135,9 +153,10 @@ def PlotPath(path):
 
 
 if __name__ == '__main__':
-    mazeList = pd.read_csv("Homework 1\Map2.csv", header=None).to_numpy()
+    mazeList = pd.read_csv("Homework 1\Map1.csv", header=None).to_numpy()
     
     height, width = mazeList.shape
+    nodeDistances = np.zeros(mazeList.shape, dtype=int)
     start = np.where(mazeList==2)
     startLoc = np.array([start[0][0],start[1][0]])
 
@@ -147,7 +166,7 @@ if __name__ == '__main__':
     ax = fig.add_subplot(111)
 
     Draw_Maze_Innit(mazeList)
-    shortestPath = BFS(mazeList, startLoc)
+    shortestPath = Dijkstra(mazeList, [startLoc[0],startLoc[1],0])
     PlotPath(shortestPath)
 
     # Keeping the updating plot open
