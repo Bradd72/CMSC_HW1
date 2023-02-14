@@ -63,6 +63,7 @@ def DFS(maze, s):
 
     calcTime = time.time()-startTime
     print('Search: {} seconds'.format(calcTime))
+    print('Nodes Visited: {}'.format(depthCounter))
     
     Plot_Search_Path(modifiedNodes, modifiedNodeStatus)
     #Draw_Maze_Innit(maze)
@@ -135,7 +136,7 @@ def PlotPath(path):
 
 
 if __name__ == '__main__':
-    mazeList = pd.read_csv("Homework 1\Map2.csv", header=None).to_numpy()
+    mazeList = pd.read_csv("Homework 1\Map3.csv", header=None).to_numpy()
     
     height, width = mazeList.shape
     start = np.where(mazeList==2)
@@ -143,10 +144,11 @@ if __name__ == '__main__':
 
     # Start interactive plot
     plt.ion()
-    fig = plt.figure(figsize=(12, 12))
+    fig = plt.figure(figsize=(10, 10))
     ax = fig.add_subplot(111)
 
     Draw_Maze_Innit(mazeList)
+    time.sleep(1)
     shortestPath = DFS(mazeList, startLoc)
     PlotPath(shortestPath)
 
