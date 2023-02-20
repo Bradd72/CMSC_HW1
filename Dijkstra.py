@@ -31,8 +31,8 @@ def Dijkstra(maze, s):
         currNode[2] = nodeDistances[currNode[0],currNode[1]]
         
         # Check surrounding 8 (or 4) nodes
-        #for i in [[-1,-1,1.4142],[0,-1,1.0],[1,-1,1.4142],[-1,0,1.0],[1,0,1.0],[-1,1,1.4142],[0,1,1.0],[1,1,1.4142]]:  
-        for i in [[0,-1,1],[-1,0,1],[1,0,1],[0,1,1]]:  
+        for i in [[-1,-1,1.4142],[0,-1,1.0],[1,-1,1.4142],[-1,0,1.0],[1,0,1.0],[-1,1,1.4142],[0,1,1.0],[1,1,1.4142]]:  
+        #for i in [[0,-1,1],[-1,0,1],[1,0,1],[0,1,1]]:  
             adjNode = [currNode[0]+i[0],currNode[1]+i[1],currNode[2]+i[2]]
             # end node: quit
             if maze[adjNode[0],adjNode[1]] == 3:    
